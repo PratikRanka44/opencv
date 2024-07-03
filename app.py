@@ -36,7 +36,7 @@ def run_detection():
             if area > min_area:
                 x, y, w, h = cv2.boundingRect(c)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                if os.getenv("DISPLAY"):
+                if os.getenv("DISPLAY"):  # Check if DISPLAY is available
                     import pyautogui
                     if y < prev_y:
                         pyautogui.press('space')
@@ -66,4 +66,3 @@ def stop():
     global running
     running = False
     return render_template('python.html')
-
