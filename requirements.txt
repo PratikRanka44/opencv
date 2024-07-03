@@ -52,4 +52,4 @@ urllib3==2.2.2
 Werkzeug==3.0.3
 wikipedia==1.4.0
 opencv-python-headless==4.5.5.64  # Use headless version for server environments
-pyautogui==0.9.53
+
