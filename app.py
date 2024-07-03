@@ -1,9 +1,14 @@
 from flask import Flask, redirect, url_for, send_from_directory
 import cv2
 import numpy as np
-import pyautogui
 import threading
 import os
+
+# Set a dummy DISPLAY variable
+os.environ['DISPLAY'] = ':0.0'  # Replace ':0.0' with your specific display configuration if needed
+
+# Now import pyautogui or other libraries that require DISPLAY
+import pyautogui
 
 app = Flask(__name__)
 
