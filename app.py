@@ -1,14 +1,8 @@
-from flask import Flask, redirect, url_for, send_from_directory
+from flask import Flask, render_template, redirect, url_for
 import cv2
 import numpy as np
 import threading
 import os
-
-# Set a dummy DISPLAY variable
-os.environ['DISPLAY'] = ':0.0'  # Replace ':0.0' with your specific display configuration if needed
-
-# Now import pyautogui or other libraries that require DISPLAY
-import pyautogui
 
 app = Flask(__name__)
 
@@ -35,15 +29,17 @@ def run_detection():
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
-        contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         for c in contours:
             area = cv2.contourArea(c)
             if area > min_area:
                 x, y, w, h = cv2.boundingRect(c)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                if y < prev_y:
-                    pyautogui.press('space')
+                if os.getenv("DISPLAY"):
+                    import pyautogui
+                    if y < prev_y:
+                        pyautogui.press('space')
                 prev_y = y
 
         cv2.imshow('frame', frame)
@@ -55,7 +51,7 @@ def run_detection():
 
 @app.route('/')
 def index():
-    return send_from_directory(os.getcwd(), 'index.html')
+    return redirect(url_for('static', filename='index.html'))
 
 @app.route('/run')
 def run():
@@ -63,11 +59,13 @@ def run():
     running = True
     thread = threading.Thread(target=run_detection)
     thread.start()
-    return redirect(url_for('index'))
+    return render_template('python.html')
 
 @app.route('/stop')
 def stop():
     global running
     running = False
-    return redirect(url_for('index'))
+    return render_template('python.html')
 
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
